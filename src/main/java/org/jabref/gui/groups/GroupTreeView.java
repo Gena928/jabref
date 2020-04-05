@@ -142,7 +142,6 @@ public class GroupTreeView {
                 })
                 .install(numberColumn);
 
-
         // Arrow indicating expanded status
         new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
                 .withGraphic(viewModel -> {
