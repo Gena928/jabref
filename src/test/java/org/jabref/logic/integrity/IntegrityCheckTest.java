@@ -208,7 +208,8 @@ class IntegrityCheckTest {
                 "",
                 CitationKeyGenerator.DEFAULT_UNWANTED_CHARACTERS,
                 keyPattern,
-                ',');
+                ',',
+                false);
     }
 
     private BibDatabaseContext withMode(BibDatabaseContext context, BibDatabaseMode mode) {

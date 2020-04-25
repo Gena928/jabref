@@ -149,6 +149,8 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue with the Library of Congress importer.
 - We fixed the [link to the external libraries listing](https://github.com/JabRef/jabref/blob/master/external-libraries.md) in the about dialog
 - We fixed an issue regarding pasting on Linux. [#6293](https://github.com/JabRef/jabref/issues/6293)
+- We fixed the paste entry command in the menu and toolbar, that did not do anything. [#6293](https://github.com/JabRef/jabref/issues/6293)
+- We fixed an issue where the windows installer did not create an entry in the start menu [bug report in the forum](https://discourse.jabref.org/t/error-while-fetching-from-doi/2018/3)
 
 ### Removed
 
@@ -205,6 +207,7 @@ Note that this project **does not** adhere to [Semantic Versioning](http://semve
 - We fixed an issue where the blue and red text colors in the Merge entries dialog were not quite visible [#6334](https://github.com/JabRef/jabref/issues/6334)
 - We fixed an issue where underscore character was removed from the file name in the Recent Libraries list in File menu [#6383](https://github.com/JabRef/jabref/issues/6383)
 - We fixed an issue where few keyboard shortcuts regarding new entries were missing [#6403](https://github.com/JabRef/jabref/issues/6403)
+
 
 ### Removed
 
