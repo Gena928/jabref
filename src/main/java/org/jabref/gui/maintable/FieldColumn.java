@@ -2,6 +2,7 @@ package org.jabref.gui.maintable;
 
 import javafx.beans.value.ObservableValue;
 
+import org.jabref.model.entry.field.Field;
 import org.jabref.model.entry.field.OrFields;
 
 /**
@@ -26,7 +27,7 @@ public class FieldColumn extends MainTableColumn<String> {
      */
     @Override
     public String getDisplayName() {
-        return fields.getDisplayName();
+        return fields.getNotSortedDisplayName();
     }
 
     private ObservableValue<String> getFieldValue(BibEntryTableViewModel entry) {

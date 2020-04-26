@@ -46,9 +46,10 @@ public class FieldFactory {
     }
 
     public static OrFields parseOrFields(String fieldNames) {
-        Set<Field> fields = Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))
-                     .map(FieldFactory::parseField)
-                     .collect(Collectors.toSet());
+        // ArrayList required to save the order of columns
+        ArrayList<Field> fields = Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))
+                .map(FieldFactory::parseField)
+                .collect(Collectors.toCollection(ArrayList::new));
         return new OrFields(fields);
     }
 
