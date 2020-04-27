@@ -23,6 +23,11 @@ public class OrFields extends TreeSet<Field> implements Comparable<OrFields> {
         addAll(fields);
     }
 
+    public OrFields(Collection<Field> fields, Comparator<Field> fieldComparator) {
+        super(fieldComparator);
+        addAll(fields);
+    }
+
     public String getDisplayName() {
         StringJoiner joiner = new StringJoiner("/");
         for (Field field : this) {

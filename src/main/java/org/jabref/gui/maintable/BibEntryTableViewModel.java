@@ -33,7 +33,7 @@ public class BibEntryTableViewModel {
     private final BibEntry entry;
     private final BibDatabase database;
     private final MainTableNameFormatter nameFormatter;
-    private final Map<OrFields, ObservableValue<String>> fieldValues = new HashMap<>();
+    private final Map<String, ObservableValue<String>> fieldValues = new HashMap<>();
     private final Map<SpecialField, ObservableValue<Optional<SpecialFieldValueViewModel>>> specialFieldValues = new HashMap<>();
     private final MonadicBinding<List<LinkedFile>> linkedFiles;
     private final ObjectBinding<Map<Field, String>> linkedIdentifiers;
@@ -111,7 +111,7 @@ public class BibEntryTableViewModel {
     }
 
     public ObservableValue<String> getFields(OrFields fields) {
-        ObservableValue<String> value = fieldValues.get(fields);
+        ObservableValue<String> value = fieldValues.get(fields.getDisplayName());
         if (value != null) {
             return value;
         } else {
@@ -134,7 +134,7 @@ public class BibEntryTableViewModel {
                     return result;
                 }
             }, entry.getObservables());
-            fieldValues.put(fields, value);
+            fieldValues.put(fields.getDisplayName(), value);
             return value;
         }
     }

@@ -5,8 +5,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Predicate;
@@ -49,6 +51,16 @@ public class FieldFactory {
         Set<Field> fields = Arrays.stream(fieldNames.split(FieldFactory.FIELD_OR_SEPARATOR))
                      .map(FieldFactory::parseField)
                      .collect(Collectors.toSet());
+
+        if (fieldNames.contains(FieldFactory.FIELD_OR_SEPARATOR)) {
+            String[] names = fieldNames.split("/");
+            Map<String, Integer> sortMap = new HashMap<>();
+            for (int i = 0; i < names.length; i++) {
+                sortMap.put(names[i].toLowerCase(), i);
+            }
+            Comparator<Field> comparator = Comparator.comparing(field-> sortMap.get(field.getName().toLowerCase()));
+            return new OrFields(fields, comparator);
+        }
         return new OrFields(fields);
     }
 
