@@ -65,6 +65,8 @@ public class NewEntryAction extends SimpleCommand {
             trackNewEntry(selectedType);
             jabRefFrame.getCurrentBasePanel().insertEntry(new BibEntry(selectedType));
         }
+        // Clear search results filters. This makes a new entry visible on a screen.
+        jabRefFrame.getGlobalSearchBar().endSearch();
     }
 
     private void trackNewEntry(EntryType type) {
