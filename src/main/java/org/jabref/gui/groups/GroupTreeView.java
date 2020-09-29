@@ -44,11 +44,12 @@ import org.jabref.gui.util.ViewModelTreeTableCellFactory;
 import org.jabref.logic.l10n.Localization;
 import org.jabref.model.entry.BibEntry;
 import org.jabref.model.groups.AllEntriesGroup;
+import org.jabref.preferences.JabRefPreferences;
 import org.jabref.preferences.PreferencesService;
 
-import com.tobiasdiez.easybind.EasyBind;
 import org.controlsfx.control.textfield.CustomTextField;
 import org.controlsfx.control.textfield.TextFields;
+import org.fxmisc.easybind.EasyBind;
 import org.reactfx.util.FxTimer;
 import org.reactfx.util.Timer;
 import org.slf4j.Logger;
@@ -71,6 +72,7 @@ public class GroupTreeView {
 
     private GroupTreeViewModel viewModel;
     private CustomLocalDragboard localDragboard;
+    private JabRefPreferences preferences;
 
     private DragExpansionHandler dragExpansionHandler;
 
@@ -78,6 +80,7 @@ public class GroupTreeView {
     public void initialize() {
         this.localDragboard = stateManager.getLocalDragboard();
         viewModel = new GroupTreeViewModel(stateManager, dialogService, preferencesService, taskExecutor, localDragboard);
+        preferences = JabRefPreferences.getInstance();
 
         // Set-up groups tree
         groupTree.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -126,7 +129,7 @@ public class GroupTreeView {
         new ViewModelTreeTableCellFactory<GroupNodeViewModel>()
                 .withGraphic(group -> {
                     final StackPane node = new StackPane();
-                    node.getStyleClass().setAll("hits");
+
                     if (!group.isRoot()) {
                         BindingsHelper.includePseudoClassWhen(node, anySelected,
                                 group.anySelectedEntriesMatchedProperty());
@@ -134,7 +137,8 @@ public class GroupTreeView {
                                 group.allSelectedEntriesMatchedProperty());
                     }
                     Text text = new Text();
-                    if (preferencesService.getDisplayGroupCount()) {
+                    if (preferences.getBoolean(JabRefPreferences.DISPLAY_GROUP_QUANTITY)) {
+                        node.getStyleClass().setAll("hits");
                         text.textProperty().bind(group.getHits().asString());
                     }
                     text.getStyleClass().setAll("text");
@@ -174,6 +178,7 @@ public class GroupTreeView {
 
                 boolean isFirstLevel = (newTreeItem != null) && (newTreeItem.getParent() == treeTable.getRoot());
                 row.pseudoClassStateChanged(subElementPseudoClass, !isRoot && !isFirstLevel);
+
             });
             // Remove disclosure node since we display custom version in separate column
             // Simply setting to null is not enough since it would be replaced by the default node on every change
@@ -182,7 +187,7 @@ public class GroupTreeView {
 
             // Add context menu (only for non-null items)
             row.contextMenuProperty().bind(
-                    EasyBind.wrapNullable(row.itemProperty())
+                    EasyBind.monadic(row.itemProperty())
                             .map(this::createContextMenuForGroup)
                             .orElse((ContextMenu) null));
             row.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
@@ -219,7 +224,7 @@ public class GroupTreeView {
                 if ((event.getGestureSource() != row) && (row.getItem() != null) && row.getItem().acceptableDrop(dragboard)) {
                     event.acceptTransferModes(TransferMode.MOVE, TransferMode.LINK);
 
-                    // expand node and all children on drag over
+                    //expand node and all children on drag over
                     dragExpansionHandler.expandGroup(row.getTreeItem());
 
                     if (localDragboard.hasBibEntries()) {
@@ -242,8 +247,7 @@ public class GroupTreeView {
                     List<String> pathToSources = (List<String>) dragboard.getContent(DragAndDropDataFormats.GROUP);
                     List<GroupNodeViewModel> changedGroups = new LinkedList<>();
                     for (String pathToSource : pathToSources) {
-                        Optional<GroupNodeViewModel> source = viewModel
-                                .rootGroupProperty().get()
+                        Optional<GroupNodeViewModel> source = viewModel.rootGroupProperty().get()
                                 .getChildByPath(pathToSource);
                         if (source.isPresent()) {
                             source.get().draggedOn(row.getItem(), ControlHelper.getDroppingMouseLocation(row, event));
@@ -358,20 +362,20 @@ public class GroupTreeView {
         menu.getItems().add(sortAlphabetically);
 
         // TODO: Disable some actions under certain conditions
-        // if (group.canBeEdited()) {
-        // editGroupPopupAction.setEnabled(false);
-        // addGroupPopupAction.setEnabled(false);
-        // removeGroupAndSubgroupsPopupAction.setEnabled(false);
-        // removeGroupKeepSubgroupsPopupAction.setEnabled(false);
-        // } else {
-        // editGroupPopupAction.setEnabled(true);
-        // addGroupPopupAction.setEnabled(true);
-        // addGroupPopupAction.setNode(node);
-        // removeGroupAndSubgroupsPopupAction.setEnabled(true);
-        // removeGroupKeepSubgroupsPopupAction.setEnabled(true);
-        // }
-        // sortSubmenu.setEnabled(!node.isLeaf());
-        // removeSubgroupsPopupAction.setEnabled(!node.isLeaf());
+        //if (group.canBeEdited()) {
+        //editGroupPopupAction.setEnabled(false);
+        //addGroupPopupAction.setEnabled(false);
+        //removeGroupAndSubgroupsPopupAction.setEnabled(false);
+        //removeGroupKeepSubgroupsPopupAction.setEnabled(false);
+        //} else {
+        //editGroupPopupAction.setEnabled(true);
+        //addGroupPopupAction.setEnabled(true);
+        //addGroupPopupAction.setNode(node);
+        //removeGroupAndSubgroupsPopupAction.setEnabled(true);
+        //removeGroupKeepSubgroupsPopupAction.setEnabled(true);
+        //}
+        //sortSubmenu.setEnabled(!node.isLeaf());
+        //removeSubgroupsPopupAction.setEnabled(!node.isLeaf());
 
         return menu;
     }
@@ -395,7 +399,7 @@ public class GroupTreeView {
         }
     }
 
-    private static class DragExpansionHandler {
+    private class DragExpansionHandler {
         private static final long DRAG_TIME_BEFORE_EXPANDING_MS = 1000;
         private TreeItem<GroupNodeViewModel> draggedItem;
         private long dragStarted;
